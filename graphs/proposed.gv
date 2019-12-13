@@ -1,0 +1,18 @@
+digraph Current {
+    node[shape="box"];
+
+    subgraph cluster0 {
+        label = "Proposed Flow"
+
+        main [style=filled]
+        "Asset::from_url"
+        "Asset::download_complete" [style=filled]
+        "Asset::download" [style=filled]
+        main -> "Asset::to_string";
+        main -> "Asset::from_url";
+        main -> "Asset::download_complete";
+        "Asset::download_complete" -> "Asset::download";
+        "Asset::download" -> "Resource::from_bytes";
+        "Asset::download" -> "Resource::needed_assets";
+    }
+}

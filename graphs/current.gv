@@ -1,0 +1,20 @@
+digraph Current {
+    node[shape="box"];
+
+    subgraph cluster0 {
+        label = "Current Flow"
+        main [style=filled];
+        walk_and_embed_assets [style=filled];
+        retrieve_assets [style=filled];
+        resolve_css_imports [style=filled];
+        main -> walk_and_embed_assets;
+        main -> retrieve_assets;
+        walk_and_embed_assets -> walk_and_embed_assets;
+        walk_and_embed_assets -> resolve_css_imports;
+        walk_and_embed_assets -> retrieve_assets;
+        walk_and_embed_assets -> to_dataurl;
+        resolve_css_imports -> to_dataurl;
+        resolve_css_imports -> resolve_css_imports;
+        retrieve_assets -> to_dataurl;
+    }
+}
