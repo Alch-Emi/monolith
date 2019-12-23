@@ -25,6 +25,6 @@ impl Resource for InertResource {
     }
 
     fn into_bytes(self) -> Result<Bytes> {
-        self.data.ok_or(Error::SelfUnloaded)
+        self.data.ok_or(Error::AssetUnloaded)
     }
 }

@@ -23,8 +23,7 @@ pub struct Asset {
 }
 
 pub enum Error {
-    SelfUnloaded,
-    AssetsUnloaded,
+    AssetUnloaded,
     HttpError(reqwest::Error),
     ParseError(Box<dyn std::error::Error>),
 }
@@ -99,7 +98,7 @@ impl Asset {
                         to_download.push(asset.download(client));
                     }
                 },
-                Err(Error::SelfUnloaded) | Err(Error::AssetsUnloaded) => {
+                Err(Error::AssetUnloaded) => {
                     unreachable!();
                 },
                 Err(HttpError(e)) => {
