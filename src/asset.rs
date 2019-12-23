@@ -33,8 +33,8 @@ use Error::*;
 pub type Result<T> = std::result::Result<T, Error>;
 
 impl Asset {
-    pub fn new(url: Url, mime: String) -> Asset {
-        Asset { url, mime, data: None };
+    pub fn new(url: Url, mime_hint: String) -> Asset {
+        Asset { url, mime_hint, data: None }
     }
 
     pub async fn download(
@@ -76,7 +76,7 @@ impl Asset {
         }
 
         // Return any new assets that need to be downloaded
-        inner_resource.needed_assets()
+        Ok(inner_resource.needed_assets())
     }
 
     /// Asyncronously download all needed assets in parallel
