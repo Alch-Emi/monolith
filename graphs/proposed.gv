@@ -5,14 +5,17 @@ digraph Current {
         label = "Proposed Flow"
 
         main [style=filled]
-        "Asset::from_url"
+        "Asset::new"
         "Asset::download_complete" [style=filled]
         "Asset::download" [style=filled]
-        main -> "Asset::to_string";
-        main -> "Asset::from_url";
+        main -> "Asset::new";
         main -> "Asset::download_complete";
         "Asset::download_complete" -> "Asset::download";
-        "Asset::download" -> "Resource::from_bytes";
+        "Asset::download" -> "Resource::new";
+        "Asset::download" -> "Resource::parse";
         "Asset::download" -> "Resource::needed_assets";
+        main -> "Resource::render"
+        "Resource::render" -> "Resource::render"
+        "Resource::parse" -> "Asset::new";
     }
 }
