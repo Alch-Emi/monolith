@@ -6,14 +6,14 @@ use reqwest::Client;
 
 use std::boxed::Box;
 
-// use crate::dummy_resource::DummyResource;
+use crate::resources::DemoResource;
 use crate::resources::InertResource;
 
 pub trait Resource {
     fn parse(&mut self, bytes: Bytes) -> Result<()>;
     fn has_data(&self) -> bool;
     fn needed_assets(&mut self) -> Vec<&mut Asset>;
-    fn into_bytes(self) -> Result<Bytes>;
+    fn render(&self) -> Result<Bytes>;
 }
 
 pub struct Asset {
@@ -22,6 +22,7 @@ pub struct Asset {
     pub data: Option<Box<dyn Resource>>,
 }
 
+#[derive(Debug)]
 pub enum Error {
     AssetUnloaded,
     HttpError(reqwest::Error),
@@ -42,19 +43,20 @@ impl Asset {
     ) -> Result<Vec<&mut Asset>> {
 
         // If this asset hasn't formed yet, create a resource for it.
+        let mime = &self.mime_hint;
+        let url = &self.url;
         let inner_resource = self.data.get_or_insert_with(|| {
             // Attempt to pick a default resource type by MIME type
-            Box::new(
-                //if mime.ignore_ascii_case_eq("text/plain") {
-                //    DummyResource::new(self.url.clone())
-                //} else {
-                    InertResource::default()
-                //}
-            )
+            if mime.eq_ignore_ascii_case("text/plain") {
+                Box::new(DemoResource::new(url.clone()))
+            } else {
+                Box::new(InertResource::default())
+            }
         });
 
         // If the asset hasn't been filled with data yet, download and fill it
         if !inner_resource.has_data() {
+
             // Get bytes
             let bytes = match client.get(self.url.clone())
                 .send()

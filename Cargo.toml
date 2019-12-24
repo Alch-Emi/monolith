@@ -27,3 +27,6 @@ lazy_static = "1.4.0"
 
 # Generating dataurls
 base64 = "0.11.0"
+
+# Reqwest must run in a tokio context
+tokio = "0.2.0-alpha.6"

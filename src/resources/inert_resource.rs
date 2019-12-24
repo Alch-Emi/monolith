@@ -24,7 +24,7 @@ impl Resource for InertResource {
         vec![]
     }
 
-    fn into_bytes(self) -> Result<Bytes> {
-        self.data.ok_or(Error::AssetUnloaded)
+    fn render(&self) -> Result<Bytes> {
+        self.data.clone().ok_or(Error::AssetUnloaded)
     }
 }
