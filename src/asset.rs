@@ -1,8 +1,8 @@
 use bytes::Bytes;
 use futures::stream::FuturesUnordered;
 use futures::stream::StreamExt;
-use reqwest::Url;
 use reqwest::Client;
+use reqwest::Url;
 
 use std::boxed::Box;
 
@@ -34,7 +34,11 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 impl Asset {
     pub fn new(url: Url, mime_hint: String) -> Asset {
-        Asset { url, mime_hint, data: None }
+        Asset {
+            url,
+            mime_hint,
+            data: None,
+        }
     }
 
     pub async fn download(
@@ -99,16 +103,16 @@ impl Asset {
                     for asset in undownloaded_assets {
                         to_download.push(asset.download(client));
                     }
-                },
+                }
                 Err(Error::AssetUnloaded) => {
                     unreachable!();
-                },
+                }
                 Err(HttpError(e)) => {
                     eprintln!("HTTP Error: {}", e);
-                },
+                }
                 Err(ParseError(e)) => {
                     eprintln!("Warning: Parser error: {}", e.as_ref());
-                },
+                }
             }
         }
 

@@ -1,5 +1,5 @@
-mod inert_resource;
 mod demo_resource;
+mod inert_resource;
 
-pub use inert_resource::InertResource;
 pub use demo_resource::DemoResource;
+pub use inert_resource::InertResource;

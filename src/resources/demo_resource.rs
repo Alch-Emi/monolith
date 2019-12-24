@@ -14,8 +14,7 @@ use crate::util::data_to_dataurl;
 
 lazy_static! {
     static ref URL_MATCH: Regex =
-        Regex::new(r###"(?:'|")(?P<inner>[^"'\n\s]+?)(?:"|')"###)
-        .unwrap();
+        Regex::new(r###"(?:'|")(?P<inner>[^"'\n\s]+?)(?:"|')"###).unwrap();
 }
 
 pub struct DemoResource {
@@ -36,7 +35,6 @@ impl DemoResource {
 
 impl Resource for DemoResource {
     fn parse(&mut self, bytes: Bytes) -> Result<()> {
-
         if self.has_data() {
             panic!(".parse() called twice on DemoResource");
         }
@@ -45,19 +43,17 @@ impl Resource for DemoResource {
         self.data = Some(
             str::from_utf8(&bytes)
                 .map_err(|e| Error::ParseError(Box::new(e)))?
-                .to_owned()
+                .to_owned(),
         );
         let data = self.data.as_ref().unwrap();
 
         // Find any potential URLs
         for link in URL_MATCH.captures_iter(data) {
-
             // The URL in the match
             let inner_match = link.name("inner").unwrap();
 
             // Validate URL
             if let Ok(url) = self.url.join(inner_match.as_str()) {
-
                 // Check to see if it's text, by checking extension
                 let is_text = inner_match.as_str().ends_with("txt");
 
@@ -97,7 +93,8 @@ impl Resource for DemoResource {
         // Make replacements
         // Reversed so that ranges remain accurate
         for (range, data) in self.resources.iter().rev() {
-            content.replace_range(range.clone(),
+            content.replace_range(
+                range.clone(),
                 &data_to_dataurl(
                     &data.mime_hint,
                     &data.data.as_ref().ok_or(
