@@ -1,0 +1,4 @@
+Hello world!
+
+"linked_resource.txt"
+"parallel.txt"
