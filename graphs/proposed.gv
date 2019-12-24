@@ -7,9 +7,11 @@ digraph Current {
         main [style=filled]
         "Asset::new"
         "Asset::download_complete" [style=filled]
+        "Asset::auto_select_resource_type"
         "Asset::download" [style=filled]
         main -> "Asset::new";
         main -> "Asset::download_complete";
+        "Asset::download_complete" -> "Asset::auto_select_resource_type";
         "Asset::download_complete" -> "Asset::download";
         "Asset::download" -> "Resource::new";
         "Asset::download" -> "Resource::parse";

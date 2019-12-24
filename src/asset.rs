@@ -27,6 +27,7 @@ pub enum Error {
     AssetUnloaded,
     HttpError(reqwest::Error),
     ParseError(Box<dyn std::error::Error>),
+    MissingResource,
 }
 use Error::*;
 
@@ -46,17 +47,8 @@ impl Asset {
         client: &Client
     ) -> Result<Vec<&mut Asset>> {
 
-        // If this asset hasn't formed yet, create a resource for it.
-        let mime = &self.mime_hint;
-        let url = &self.url;
-        let inner_resource = self.data.get_or_insert_with(|| {
-            // Attempt to pick a default resource type by MIME type
-            if mime.eq_ignore_ascii_case("text/plain") {
-                Box::new(DemoResource::new(url.clone()))
-            } else {
-                Box::new(InertResource::default())
-            }
-        });
+        // If this asset hasn't formed yet, throw an error
+        let inner_resource = self.data.as_mut().ok_or(MissingResource)?;
 
         // If the asset hasn't been filled with data yet, download and fill it
         if !inner_resource.has_data() {
@@ -84,11 +76,27 @@ impl Asset {
         Ok(inner_resource.needed_assets())
     }
 
+    pub fn auto_select_resource_type(&mut self) -> &mut Box<dyn Resource> {
+        let mime = &self.mime_hint;
+        let url = &self.url;
+        let inner_resource = self.data.get_or_insert_with(|| {
+            // Attempt to pick a default resource type by MIME type
+            if mime.eq_ignore_ascii_case("text/plain") {
+                Box::new(DemoResource::new(url.clone()))
+            } else {
+                Box::new(InertResource::default())
+            }
+        });
+        return inner_resource;
+    }
+
     /// Asyncronously download all needed assets in parallel
     pub async fn download_complete(
         &mut self,
         client: &Client
     ) -> Result<()> {
+        // Pick a parser, if not already selected
+        self.auto_select_resource_type();
 
         // Create a queue of pending futures
         let mut to_download = FuturesUnordered::new();
@@ -101,10 +109,11 @@ impl Asset {
                     // Will return a list of new assets to be downloaded.
                     // Download each new asset
                     for asset in undownloaded_assets {
+                        asset.auto_select_resource_type();
                         to_download.push(asset.download(client));
                     }
-                }
-                Err(Error::AssetUnloaded) => {
+                },
+                Err(Error::AssetUnloaded) | Err(MissingResource) => {
                     unreachable!();
                 }
                 Err(HttpError(e)) => {
