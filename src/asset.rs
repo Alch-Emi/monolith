@@ -127,4 +127,15 @@ impl Asset {
 
         Ok(())
     }
+
+    pub fn try_stringify(&self) -> Result<String>  {
+        std::str::from_utf8(
+            &self.data
+                .as_ref()
+                .ok_or(Error::MissingResource)?
+                .render()?
+        )
+            .map_err(|e| Error::ParseError(Box::new(e)))
+            .map(str::to_owned)
+    }
 }
