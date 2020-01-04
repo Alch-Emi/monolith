@@ -13,6 +13,6 @@ pub async fn download_complete_page(url: Url) -> asset::Result<String> {
         url,
         "text/plain".to_owned(),
     );
-    asset.download_complete(&client).await?;
+    asset.download_complete(&client).await;
     asset.try_stringify()
 }

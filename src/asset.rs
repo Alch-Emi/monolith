@@ -257,7 +257,7 @@ impl Asset {
     pub async fn download_complete(
         &mut self,
         client: &Client
-    ) -> Result<()> {
+    ) {
         // Pick a parser, if not already selected
         self.auto_select_resource_type();
 
@@ -287,8 +287,6 @@ impl Asset {
                 }
             }
         }
-
-        Ok(())
     }
 
     /// Attempt to render this Asset as a [String]
