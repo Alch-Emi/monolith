@@ -95,7 +95,7 @@ pub trait Resource {
     /// ```
     ///
     /// If this method is called before [Resource::parse] has been successfully
-    /// called, then it should return an [Error::AssetUnloaded] to indicate
+    /// called, then it should return an [Error::ResourceUnloaded] to indicate
     /// this.
     fn render(&self) -> Result<Bytes>;
 }
@@ -140,7 +140,7 @@ pub enum Error {
 
     /// Denotes that there was an attempt to [render][Resource::render] or
     /// otherwise work with a [Resource] that hadn't been supplied data
-    AssetUnloaded,
+    ResourceUnloaded,
 
     /// Denotes a network error that occurred while fetching an asset
     HttpError(reqwest::Error),
@@ -276,7 +276,7 @@ impl Asset {
                         to_download.push(asset.download(client));
                     }
                 },
-                Err(Error::AssetUnloaded) | Err(MissingResource) => {
+                Err(Error::ResourceUnloaded) | Err(MissingResource) => {
                     unreachable!();
                 }
                 Err(HttpError(e)) => {

@@ -25,6 +25,6 @@ impl Resource for InertResource {
     }
 
     fn render(&self) -> Result<Bytes> {
-        self.data.clone().ok_or(Error::AssetUnloaded)
+        self.data.clone().ok_or(Error::ResourceUnloaded)
     }
 }

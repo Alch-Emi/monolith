@@ -88,7 +88,7 @@ impl Resource for DemoResource {
     fn render(&self) -> Result<Bytes> {
 
         // Unwrap inner content
-        let mut content = self.data.clone().ok_or(Error::AssetUnloaded)?;
+        let mut content = self.data.clone().ok_or(Error::ResourceUnloaded)?;
 
         // Make replacements
         // Reversed so that ranges remain accurate
@@ -98,7 +98,7 @@ impl Resource for DemoResource {
                 &data_to_dataurl(
                     &data.mime_hint,
                     &data.data.as_ref().ok_or(
-                        Error::AssetUnloaded
+                        Error::ResourceUnloaded
                     )?.render()?,
                 )
             );
