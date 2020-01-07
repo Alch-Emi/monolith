@@ -7,13 +7,13 @@ digraph Current {
         download_complete_page [style=filled]
         "Asset::new"
         "Asset::download_complete" [style=filled]
-        "Asset::auto_select_resource_type"
+        "Asset::basic_resource_selector"
         "Asset::download" [style=filled]
         download_complete_page -> "Asset::new";
         download_complete_page -> "Asset::download_complete";
-        "Asset::download_complete" -> "Asset::auto_select_resource_type";
+        "Asset::download_complete" -> "Asset::basic_resource_selector";
         "Asset::download_complete" -> "Asset::download";
-        "Asset::auto_select_resource_type" -> "Resource::new"
+        "Asset::basic_resource_selector" -> "Resource::new"
         "Asset::download" -> "Resource::parse";
         "Asset::download" -> "Resource::needed_assets";
         download_complete_page -> "Asset::try_stringify"
