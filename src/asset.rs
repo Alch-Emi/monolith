@@ -181,8 +181,9 @@ impl Asset {
     /// formed Assets that need to be downloaded as well.
     ///
     /// Possible error conditions:
-    /// * `MissingResource`: A parser ([Resource]) hasn't been selected yet.  Call
-    ///   [Asset::auto_select_resource_type] or set [Asset::data] yourself.
+    /// * `MissingResource`: A parser ([Resource]) hasn't been selected yet.
+    ///    Set [Asset::data] yourself, possibly using
+    ///    [Asset::basic_resource_selector]
     /// * `HttpError`: An error returned by reqwest while attempting to download
     /// * Other errors can be returned by [Resource::parse]
     pub async fn download(
@@ -222,23 +223,17 @@ impl Asset {
     /// Attempt to select a [Resource] type based on the MIME
     ///
     /// This method uses [Asset::mime_hint] to make a guess about what to
-    /// populate [Asset::data] with.  If the resource type has already been
-    /// selected, then it is kept.
+    /// populate [Asset::data] with.
     ///
     /// The exact mechanics of this method haven't been solidified yet, as not
     /// all relevant Resources have been added.
-    pub fn auto_select_resource_type(&mut self) -> &mut Box<dyn Resource> {
-        let mime = &self.mime_hint;
-        let url = &self.url;
-        let inner_resource = self.data.get_or_insert_with(|| {
-            // Attempt to pick a default resource type by MIME type
-            if mime.eq_ignore_ascii_case("text/plain") {
-                Box::new(DemoResource::new(url.clone()))
-            } else {
-                Box::new(InertResource::default())
-            }
-        });
-        return inner_resource;
+    pub fn basic_resource_selector(&self) -> Box<dyn Resource> {
+        // Attempt to pick a default resource type by MIME type
+        if self.mime_hint.eq_ignore_ascii_case("text/plain") {
+            Box::new(DemoResource::new(self.url.clone()))
+        } else {
+            Box::new(InertResource::default())
+        }
     }
 
     /// Asynchronously download all needed assets in parallel
@@ -251,15 +246,27 @@ impl Asset {
     /// * Downloading and parsing the asset
     /// * and handling all subordinate assets
     ///
+    /// The `resource_selector` argument should be a function that uses a
+    /// reference to an Asset to produce an instance of the [Resource] that
+    /// should be used to parse that [Asset]'s data.  For example, given an
+    /// Asset with MIME type "text/html", and appropriate response might be an
+    /// HTMLResource.  If you are comfortable with the default logic and
+    /// parsers, pass in [Asset::basic_resource_selector]
+    ///
     /// Any encountered errors are handled by printing an error to stdout, but
     /// are otherwise ignored.  This will eventually be replaced with a proper
     /// logging protocol, or maybe returning all errors at the end.
-    pub async fn download_complete(
+    pub async fn download_complete<F>(
         &mut self,
-        client: &Client
-    ) {
+        client: &Client,
+        resource_selector: F,
+    ) where
+        F: Fn(&Asset) -> Box<dyn Resource>
+    {
         // Pick a parser, if not already selected
-        self.auto_select_resource_type();
+        if let None = self.data {
+            self.data = Some(resource_selector(&self));
+        }
 
         // Create a queue of pending futures
         let mut to_download = FuturesUnordered::new();
@@ -272,7 +279,9 @@ impl Asset {
                     // Will return a list of new assets to be downloaded.
                     // Download each new asset
                     for asset in undownloaded_assets {
-                        asset.auto_select_resource_type();
+                        // Select a Resource
+                        asset.data = Some(resource_selector(asset));
+
                         to_download.push(asset.download(client));
                     }
                 },
