@@ -5,6 +5,13 @@ use crate::asset::Error;
 use crate::asset::Resource;
 use crate::asset::Result;
 
+/// A Resource type that will never have any children
+///
+/// Ths resource represents any type of resource that requires no special
+/// parsing, and is unable to link to any other remote assets.  Its
+/// [needed_assets][Resource::needed_assets] is always an empty vector, and the
+/// [render][Resource::render] method always produces the same data that was
+/// passed in.
 #[derive(Default, Clone)]
 pub struct InertResource {
     data: Option<Bytes>,

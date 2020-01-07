@@ -17,6 +17,14 @@ lazy_static! {
         Regex::new(r###"(?:'|")(?P<inner>[^"'\n\s]+?)(?:"|')"###).unwrap();
 }
 
+/// A Resource providing a very simple proof of concept recursive resource
+///
+/// This Resource takes UTF-8 bytes and identifies any links wrapped in quotes
+/// (e.g. "https://example.com") as child Assets, and then replaces the quoted
+/// links with dataurls.
+///
+/// This resource is not meant to be used in production, and simply exists to
+/// demonstrate a simple example of a non-trivial Resource.
 pub struct DemoResource {
     data: Option<String>,
     url: Url,
