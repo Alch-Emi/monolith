@@ -100,10 +100,10 @@ pub trait Resource {
     fn render(&self) -> Result<Bytes>;
 }
 
-/// A wrapper around a reference to some remote data and the downloaded copy.
+/// A wrapper around a potentially undownloaded Resource
 ///
 /// `Asset`s are effectively a pairing between a [Url], which is some remote
-/// resource, and a [Resource], which is the local copy an structure for that
+/// resource, and a [Resource], which is the local copy and structure for that
 /// remote resource.
 ///
 /// Assets start off as just URLs.  However, they can then be downloaded,
