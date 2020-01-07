@@ -14,6 +14,7 @@ digraph Current {
         walk_and_embed_assets -> retrieve_assets;
         walk_and_embed_assets -> to_dataurl;
         resolve_css_imports -> to_dataurl;
+        resolve_css_imports -> retrieve_assets;
         resolve_css_imports -> resolve_css_imports;
         retrieve_assets -> to_dataurl;
     }

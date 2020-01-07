@@ -4,19 +4,20 @@ digraph Current {
     subgraph cluster0 {
         label = "Proposed Flow"
 
-        main [style=filled]
+        download_complete_page [style=filled]
         "Asset::new"
         "Asset::download_complete" [style=filled]
         "Asset::auto_select_resource_type"
         "Asset::download" [style=filled]
-        main -> "Asset::new";
-        main -> "Asset::download_complete";
+        download_complete_page -> "Asset::new";
+        download_complete_page -> "Asset::download_complete";
         "Asset::download_complete" -> "Asset::auto_select_resource_type";
         "Asset::download_complete" -> "Asset::download";
-        "Asset::download" -> "Resource::new";
+        "Asset::auto_select_resource_type" -> "Resource::new"
         "Asset::download" -> "Resource::parse";
         "Asset::download" -> "Resource::needed_assets";
-        main -> "Resource::render"
+        download_complete_page -> "Asset::try_stringify"
+        "Asset::try_stringify" -> "Resource::render"
         "Resource::render" -> "Resource::render"
         "Resource::parse" -> "Asset::new";
     }
